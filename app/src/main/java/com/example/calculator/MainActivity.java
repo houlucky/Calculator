@@ -6,19 +6,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 public class MainActivity extends Activity {
-    int [] numButtons;
-    int [] operationButtons;
+
     EditText editText;
     String str1="";
-    Button temp;
-    Button temp1;
-    int i;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,22 +39,26 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+
     public  void deleteOneChar(){
         Editable editable = editText.getText();
         if(!str1.isEmpty() && editText.getSelectionStart() >=1)
             editable.delete(editText.getSelectionStart() - 1, editText.getSelectionStart());
         str1 = editable.toString();
     }
+
     public void initEditText(){
         editText = (EditText)findViewById(R.id.text_view);
     }
+
     public void setNumButtonListener(){
-        numButtons = new int[] {R.id.button00, R.id.button01, R.id.button02, R.id.button03,
+        int[] numButtons = new int[] {R.id.button00, R.id.button01, R.id.button02, R.id.button03,
                 R.id.button04, R.id.button05, R.id.button06, R.id.button07,
                 R.id.button08, R.id.button09};
          Log.d("temp1", str1);
         for(int i=0; i< numButtons.length; i++){//为每一个数字按钮设置一个监听器
-            temp = (Button)findViewById(numButtons[i]);
+            Button temp = (Button)findViewById(numButtons[i]);
             temp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -66,10 +67,11 @@ public class MainActivity extends Activity {
             });
         }
     }
+
     public void setOperationButtonListener(){
-        operationButtons = new int[]{R.id.buttonAdd, R.id.buttonMultiply, R.id.buttonDivide, R.id.buttonSubtract,R.id.buttonPoint};
-        for(i=0; i< operationButtons.length; i++){//为每一个运算按钮设置一个监听器
-            temp1 = (Button)findViewById(operationButtons[i]);
+        int[] operationButtons = new int[]{R.id.buttonAdd, R.id.buttonMultiply, R.id.buttonDivide, R.id.buttonSubtract,R.id.buttonPoint};
+        for(int i=0; i< operationButtons.length; i++){//为每一个运算按钮设置一个监听器
+            Button temp1 = (Button)findViewById(operationButtons[i]);
             temp1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -84,6 +86,7 @@ public class MainActivity extends Activity {
             });
         }
     }
+
     public void insertChar(View v){
         int cursorIndex;
         str1 = editText.getText().insert(editText.getSelectionStart(), String.valueOf(((Button)v).getText())).toString();
@@ -92,6 +95,7 @@ public class MainActivity extends Activity {
         editText.setTextIsSelectable(true);
         editText.setSelection(cursorIndex);
     }
+
     public void setClearEditView(){
         Button buttonC  = (Button)findViewById(R.id.buttonDelete);
         buttonC.setOnClickListener(new View.OnClickListener() {
@@ -102,14 +106,15 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     public void setResultButton(){
         Button buttonResult = (Button)findViewById(R.id.buttonResult);
         buttonResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("temp1", str1);
-                if(str1 != "" ){
-                    if(computeWithStack(str1) % 1.0 == 0)
+                if(!"".equals(str1) ){
+                    if(computeWithStack(str1) % 1.0 == 0)//如果最后结果是一个浮点型整数(333.0)，我希望我得到的是一个整形整数(333)
                         str1 = String.valueOf((long) computeWithStack(str1));
                     else
                         str1 = String.valueOf(computeWithStack(str1));
@@ -120,6 +125,7 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     public double computeWithStack(String computeExpr) {
         StringTokenizer stringTokenizer = new StringTokenizer(computeExpr, "+-×÷", true);
         Stack<Double> numStack = new Stack<Double>();
@@ -142,14 +148,14 @@ public class MainActivity extends Activity {
                     }
                     operatorStack.push(currentOper);
                 } else {//括号的处理！！！
+
                 }
             }
         }
-        if (computeExpr == "") {
-
+        if ("".equals(computeExpr)) {
             return 0;
         }
-        if(!compareStack(numStack,operatorStack)){//true-数目相同 false-数目不相同判断数据栈中元素的个数是否比operatorStack栈中的元素多一个
+        if(compareStack(numStack,operatorStack)){//true-数目相同 false-数目不相同判断数据栈中元素的个数是否比operatorStack栈中的元素多一个
             operatorStack.pop();
         }
         while (!operatorStack.isEmpty()) {
@@ -158,6 +164,7 @@ public class MainActivity extends Activity {
 
         return numStack.pop();
     }
+
     public boolean compareStack(Stack<Double> numStack, Stack<Operator> operatorStack){
         int i=0,j=0;
         for(double A : numStack){
@@ -168,21 +175,22 @@ public class MainActivity extends Activity {
            Log.d("temp", String.valueOf(B));
             j++;
         }
-        if(i==j)
-            return false;
-        else
-            return true;
+
+        return i==j;
     }
+
     public void compute(Stack<Double> numStack, Stack<Operator> operatorStack){
         double num2 = numStack.pop();
         double num1 = numStack.pop();
         double result = operatorStack.pop().compute(num1, num2);
         numStack.push(result);
     }
+
     public boolean isNum(String s){
         String numRegex =  "^\\d+(\\.\\d+)?$";
         return Pattern.matches(numRegex, s);
     }
+
     public Map<String,Operator> geOperatorMap(){
         return  new HashMap<String,Operator>(){
             private static final long serialVersionUID = 7706718608122369958L;
@@ -194,6 +202,7 @@ public class MainActivity extends Activity {
             }
         };
     }
+
     public enum Operator{
 
         PLUS{
@@ -243,6 +252,7 @@ public class MainActivity extends Activity {
                 return 2;
             }
         };
+
         public abstract double compute(double num1, double num2);
         public abstract int priority();
     }
